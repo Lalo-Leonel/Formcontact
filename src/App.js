@@ -1,10 +1,11 @@
-import BasicTextFields from './components/Formcontacto';
-
+// import BasicTextFields from './components/Formcontacto';
+import Formulario from './components/Formulario';
 function App() {
   return (
     <div className="App">
       hello!!!...
-      <BasicTextFields/>
+      
+      <Formulario/>
     </div>
   );
 }
