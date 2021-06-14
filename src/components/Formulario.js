@@ -36,6 +36,8 @@ const Formulario = () =>{
     const handleSubmit = (event)=>{
         event.preventDefault();
         console.log('enviando datos...' + datos.nombre + ' ' + datos.email)
+
+        axios.post("http://localhost:5000/api/sendEmail", datos)
     }
     return(
         <Container  maxWidth="sm">
