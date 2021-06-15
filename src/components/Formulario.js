@@ -1,16 +1,19 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Container } from '@material-ui/core';
+import { Container, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import { useState } from 'react';
+import Swal from 'sweetalert2'
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
     '& > *': {
       margin: theme.spacing(1),
-      width: '40ch',
+      width: '35ch',
     },
   },
 }));
@@ -35,12 +38,50 @@ const Formulario = () =>{
     }
     const handleSubmit = (event)=>{
         event.preventDefault();
+
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: "btn btn-success",
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: true
+        })
+        
+        swalWithBootstrapButtons.fire({
+          title: '¿Estas seguro?',
+          text: "¡No podrás revertir esto!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Send!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post("http://localhost:5000/api/sendEmail", {datos})
+            .then(res =>{
+              console.log(res);
+              swalWithBootstrapButtons.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+              )
+            })
+            
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire(
+              'Cancelled',
+              'Your imaginary file is safe :)',
+              'error'
+            )
+          }
+        })
+
         console.log('enviando datos...' + datos.nombre + ' ' + datos.email)
 
-        axios.post("http://localhost:5000/api/sendEmail", {datos})
-          .then(res =>{
-            console.log(res);
-          })
+        
     }
     return(
         <Container  maxWidth="sm">
@@ -68,12 +109,13 @@ const Formulario = () =>{
                   variant="outlined"
                   onChange={handleInputChange}
               />
-              <Button variant="contained" color="primary" onClick={handleSubmit} >
-                Enviar
-              </Button>
+              <Grid >
+                <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth={true}>
+                  Enviar
+                </Button>
+              </Grid>
+              
           </form>
-          
-          <h4>{datos.nombre}--{datos.email}--{datos.asunto}--{datos.mensaje}</h4>
         </Container>
     )
 }
