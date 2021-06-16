@@ -38,46 +38,85 @@ const Formulario = () =>{
     }
     const handleSubmit = (event)=>{
         event.preventDefault();
-
-        const swalWithBootstrapButtons = Swal.mixin({
-          customClass: {
-            confirmButton: "btn btn-success",
-            cancelButton: 'btn btn-danger'
+        //---------------------------
+        let timerInterval
+        Swal.fire({
+          title: 'Auto close alert!',
+          html: 'I will close in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            timerInterval = setInterval(() => {
+              const content = Swal.getHtmlContainer()
+              
+              if (content) {
+                const b = content.querySelector('b')
+                if (b) {
+                  b.textContent = Swal.getTimerLeft()
+                                   
+                }
+              }
+            }, 100)
           },
-          buttonsStyling: true
-        })
-        
-        swalWithBootstrapButtons.fire({
-          title: '¿Estas seguro?',
-          text: "¡No podrás revertir esto!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, Send!',
-          cancelButtonText: 'No, cancel!',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            axios.post("http://localhost:5000/api/sendEmail", {datos})
-            .then(res =>{
-              console.log(res);
-              swalWithBootstrapButtons.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-              )
-            })
-            
-          } else if (
-            /* Read more about handling dismissals below */
-            result.dismiss === Swal.DismissReason.cancel
-          ) {
-            swalWithBootstrapButtons.fire(
-              'Cancelled',
-              'Your imaginary file is safe :)',
-              'error'
-            )
+          willClose: () => {
+            clearInterval(timerInterval)
           }
+        }).then((result) => {
+          
+          /* Read more about handling dismissals below */
+          // if (result.dismiss === Swal.DismissReason.timer) {
+            axios.post("http://localhost:5000/api/sendEmail", {datos})
+                    .then(res =>{
+                      console.log(res);
+                      if (result.dismiss === Swal.DismissReason.timer) {
+                        console.log('I was closed by the timer')
+                      }
+                      
+                    })
+                    console.log('I was closed by the timer')
+          // }
         })
+        //---------------------------
+        // const swalWithBootstrapButtons = Swal.mixin({
+        //   customClass: {
+        //     confirmButton: "btn btn-success",
+        //     cancelButton: 'btn btn-danger'
+        //   },
+        //   buttonsStyling: true
+        // })
+        
+        // swalWithBootstrapButtons.fire({
+        //   title: '¿Estas seguro?',
+        //   text: "¡No podrás revertir esto!",
+        //   icon: 'warning',
+        //   showCancelButton: true,
+        //   confirmButtonText: 'Yes, Send!',
+        //   cancelButtonText: 'No, cancel!',
+        //   reverseButtons: true
+        // }).then((result) => {
+        //   if (result.isConfirmed) {
+        //     axios.post("http://localhost:5000/api/sendEmail", {datos})
+        //     .then(res =>{
+        //       console.log(res);
+        //       swalWithBootstrapButtons.fire(
+        //         'Deleted!',
+        //         'Your file has been deleted.',
+        //         'success'
+        //       )
+        //     })
+            
+        //   } else if (
+        //     /* Read more about handling dismissals below */
+        //     result.dismiss === Swal.DismissReason.cancel
+        //   ) {
+        //     swalWithBootstrapButtons.fire(
+        //       'Cancelled',
+        //       'Your imaginary file is safe :)',
+        //       'error'
+        //     )
+        //   }
+        // })
 
         console.log('enviando datos...' + datos.nombre + ' ' + datos.email)
 
